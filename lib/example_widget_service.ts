@@ -3,7 +3,7 @@ import apigateway = require("@aws-cdk/aws-apigateway");
 import lambda = require("@aws-cdk/aws-lambda");
 import s3 = require("@aws-cdk/aws-s3");
 
-export class WidgetService extends core.Construct {
+export default class WidgetService extends core.Construct {
   constructor(scope: core.Construct, id: string) {
     super(scope, id);
 
