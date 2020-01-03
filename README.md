@@ -11,7 +11,7 @@ This is a multi-step build. Normally it goes as such:
   * Then `cdk synth` to build the CloudFormation template to be deployed
   * Continue to `cdk bootstrap` to stage it. This will create a staging bucket in S3, which __needs to be cleaned up manually__ (see [Useful commands](#useful-commands) below for more info)
   * After that, it's time to `cdk deploy`
-  * After you're done, do `cdk destroy` to cleanup after. NOTE: As of 3/2/2020 this command creates yet another S3 staging bucket and doesn't completely clean up the S3 buckets, so some manual deletion is still required __after__ it finishes deleting the CloudFormation stack.
+  * ~~After you're done, do `cdk destroy` to cleanup after.~~ NOTE: Deleting the stack(s) manually in CloudFormation console might be the best way for now (see [Useful commands](#useful-commands))
 
 ## Useful commands
   * `npm run build`   compile typescript to js
@@ -21,7 +21,7 @@ This is a multi-step build. Normally it goes as such:
   * `cdk diff`        compare deployed stack with current state
   * `cdk synth`       emits the synthesized CloudFormation template
   * `cdk bootstrap`   required to stage the stack for deployment. IMPORTANT: this creates S3 bucket which will incur a charge if not cleaned up: https://docs.aws.amazon.com/cdk/latest/guide/tools.html#tools_bootstrap so delete CDKToolkit in CloudFormation as soon as you're done
-  * `cdk destroy`     for deleting the CloudFormation stack(s). This will also create an S3 staging bucket for some reason even after deletion post-bootstrap, so again delete manually
+  * `cdk destroy`     for deleting the CloudFormation stack(s). As of 3/2/2020 this command creates yet another S3 staging bucket and doesn't completely clean up the S3 buckets, so some manual deletion is still required __after__ it finishes deleting the CloudFormation stack if going this path
 
 ## Roadmap
 Tracking -> Storing Raw Data -> Funneling into Analytics
@@ -49,13 +49,17 @@ CDK-centric questions that came up while trying this out:
 
 2. Alternatively, do development in an Admin user in `DEV` environment, and get a Cloud Security expert to set it up properly for `PROD` with proper permissions for different resources. Not ideal, but for the sake of development... just tag it [NEEDS REVIEW] and add __proper configuration__ as a __requirement for release__. 
 
-3. FYI: Remember to do `cdk destroy` with every planned infra changes to clean it up. In general, __do not__ delete resources manually since this breaks the CloudFormation reference, causing weird errors (something about environments). If needed, delete CloudFormation stack to start over.
+3. In general, __do not__ delete individual resources manually since this breaks the CloudFormation reference, causing weird errors (missing  environments etc).
+ 
+4. The recommended way is to use `cdk destroy` with every planned infra changes to clean it up. If needed, delete CloudFormation stack to start over.
 
-4. The exception to is related to `cdk bootstrap` staging process and `cdk destroy`: both create S3 CDKToolkit buckets for staging, which you need to delete manually in order to not get charged despite `cdk destroy` supposedly meant to do a one-touch cleanup...
+5. However as of 03/01/2020 there are exceptions: in `cdk bootstrap` staging process and `cdk destroy`, both create S3 CDKToolkit buckets for staging, which you need to delete manually in order to not get charged despite `cdk destroy` supposedly meant to do a one-touch cleanup...
+   
+6. So perhaps the best way for now is to delete the stack in CloudFormation until this issue gets fixed :\ more here: https://github.com/awsdocs/aws-cdk-guide/blob/master/doc_source/troubleshooting.md
 
-5. How to structure CDK if there is an established resources built via SDK?
+7. How to structure CDK if there is an established resources built via SDK?
    - Use `fromXYZ()` method in each constructs to check existing one (https://garbe.io/blog/2019/09/20/hey-cdk-how-to-use-existing-resources/)
    - In that case, it's no use having separate repos for each resource (SDK-based publishing) - can just do all in one CDK repo.
   
-6. Is this still in beta though?
+8. Is this still in beta though?
    - Possibly, considering it's not in AWS main console yet, and the general bits and pieces hanging off still (e.g. no auto-cleanup of staging bucket). It is promising, though.
