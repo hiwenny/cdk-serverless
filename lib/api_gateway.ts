@@ -2,8 +2,12 @@ import core = require("@aws-cdk/core");
 import apigateway = require("@aws-cdk/aws-apigateway");
 import lambda = require("@aws-cdk/aws-lambda");
 import s3 = require("@aws-cdk/aws-s3");
-
-export default class WidgetService extends core.Construct {
+/**
+ * This is the front door for the measurement pipeline
+ * For now it's just a rename from this example: https://docs.aws.amazon.com/cdk/latest/guide/serverless_example.html
+ * Which has 3 resources: S3, Lambda, and API Gateway
+ */
+export class API_Gateway extends core.Construct {
   constructor(scope: core.Construct, id: string) {
     super(scope, id);
 
@@ -31,20 +35,20 @@ export default class WidgetService extends core.Construct {
 
     api.root.addMethod("GET", getWidgetsIntegration); // GET /
 
-    /* More capabilities */
-    const widget = api.root.addResource("{id}");
+    // /* More capabilities */
+    // const widget = api.root.addResource("{id}");
 
-    // Add new widget to bucket with: POST /{id}
-    const postWidgetIntegration = new apigateway.LambdaIntegration(handler);
+    // // Add new widget to bucket with: POST /{id}
+    // const postWidgetIntegration = new apigateway.LambdaIntegration(handler);
 
-    // Get a specific widget from bucket with: GET /{id}
-    const getWidgetIntegration = new apigateway.LambdaIntegration(handler);
+    // // Get a specific widget from bucket with: GET /{id}
+    // const getWidgetIntegration = new apigateway.LambdaIntegration(handler);
 
-    // Remove a specific widget from the bucket with: DELETE /{id}
-    const deleteWidgetIntegration = new apigateway.LambdaIntegration(handler);
+    // // Remove a specific widget from the bucket with: DELETE /{id}
+    // const deleteWidgetIntegration = new apigateway.LambdaIntegration(handler);
 
-    widget.addMethod("POST", postWidgetIntegration); // POST /{id}
-    widget.addMethod("GET", getWidgetIntegration); // GET /{id}
-    widget.addMethod("DELETE", deleteWidgetIntegration); // DELETE /{id}
+    // widget.addMethod("POST", postWidgetIntegration); // POST /{id}
+    // widget.addMethod("GET", getWidgetIntegration); // GET /{id}
+    // widget.addMethod("DELETE", deleteWidgetIntegration); // DELETE /{id}
   }
 }
